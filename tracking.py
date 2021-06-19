@@ -10,8 +10,8 @@ mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands()
 
-
 last_time = current_time = 0
+debug = True
 
 
 while cap.isOpened():
@@ -30,10 +30,11 @@ while cap.isOpened():
     # if landmark detected
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
-            for id, land_mark in enumerate(hand_landmarks.landmark):
-                h, w, c = image.shape
-                cx, cy = int(land_mark.x*w), int(land_mark.y*h)
-                print(f"ID: {id}, x: {cx}, y: {cy}")
+            if debug:
+                for id, land_mark in enumerate(hand_landmarks.landmark):
+                    h, w, c = image.shape
+                    cx, cy = int(land_mark.x*w), int(land_mark.y*h)
+                    print(f"ID: {id}, x: {cx}, y: {cy}")
 
             mp_drawing.draw_landmarks(
             image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
