@@ -47,9 +47,16 @@ class Detector:
                 )
         return image
 
+    def get_landmark_enum_value(self, key):
+        return getattr(self.mp_hands.HandLandmark, key.upper()).value
+
     def get_landmark_position(self, image, landmark_index):
         hands = self.get_hands()
         landmarks = []
+
+        if isinstance(landmark_index, str):
+            landmark_index = self.get_landmark_enum_value(landmark_index)
+
         for hand in hands:
             landmarks = [(id, land_mark) for id, land_mark in enumerate(hand.landmark)]
             landmark = landmarks[landmark_index][1]
@@ -78,7 +85,7 @@ def main():
             continue
 
         image = detector.find_hands(image=image, draw=True)
-        landmark_position_list = detector.get_landmark_position(image, 1)
+        landmark_position_list = detector.get_landmark_position(image, "WRIST")
 
         # calculate, draw fps
         current_time = time.time()
