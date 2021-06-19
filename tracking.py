@@ -52,23 +52,25 @@ class Detector:
 
     def get_landmark_position(self, image, landmark_index):
         hands = self.get_hands()
-        landmarks = []
 
         if isinstance(landmark_index, str):
             landmark_index = self.get_landmark_enum_value(landmark_index)
 
-        for hand in hands:
+        landmarks = []
+        if hands:
+            # disabled multi-hand
+            hand = hands[0]
+
             landmarks = [(id, land_mark) for id, land_mark in enumerate(hand.landmark)]
             landmark = landmarks[landmark_index][1]
             h, w, _ = image.shape
             cx, cy = int(landmark.x * w), int(landmark.y * h)
-            landmarks.append([id, cx, cy])
 
             if self.DEBUG_MODE:
                 print(f"ID: {id}, x: {cx}, y: {cy}")
                 cv2.circle(image, (cx, cy), 10, (255, 0, 255), cv2.FILLED)
 
-        return landmarks
+            return cx, cy
 
 
 def main():
