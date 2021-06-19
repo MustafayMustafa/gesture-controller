@@ -27,27 +27,41 @@ class Detector:
             self.min_tracking_confidence,
         )
 
+    def get_hands(self):
+        if self.results.multi_hand_landmarks:
+            return self.results.multi_hand_landmarks
+
+        return []
+
     def find_hands(self, image, draw=False):
         image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
         image.flags.writeable = False
-        results = self.hands.process(image)
+        self.results = self.hands.process(image)
         image.flags.writeable = True
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-        # if landmark detected
-        if results.multi_hand_landmarks:
-            for hand_landmarks in results.multi_hand_landmarks:
-                if draw:
-                    self.mp_drawing.draw_landmarks(
-                        image, hand_landmarks, self.mp_hands.HAND_CONNECTIONS
-                    )
-                if self.DEBUG_MODE:
-                    for id, land_mark in enumerate(hand_landmarks.landmark):
-                        h, w, c = image.shape
-                        cx, cy = int(land_mark.x * w), int(land_mark.y * h)
-                        print(f"ID: {id}, x: {cx}, y: {cy}")
-
+        for hand_landmarks in self.get_hands():
+            if draw:
+                self.mp_drawing.draw_landmarks(
+                    image, hand_landmarks, self.mp_hands.HAND_CONNECTIONS
+                )
         return image
+
+    def get_landmark_position(self, image, landmark_index):
+        hands = self.get_hands()
+        landmarks = []
+        for hand in hands:
+            landmarks = [(id, land_mark) for id, land_mark in enumerate(hand.landmark)]
+            landmark = landmarks[landmark_index][1]
+            h, w, _ = image.shape
+            cx, cy = int(landmark.x * w), int(landmark.y * h)
+            landmarks.append([id, cx, cy])
+
+            if self.DEBUG_MODE:
+                print(f"ID: {id}, x: {cx}, y: {cy}")
+                cv2.circle(image, (cx, cy), 10, (255, 0, 255), cv2.FILLED)
+
+        return landmarks
 
 
 def main():
@@ -64,6 +78,13 @@ def main():
             continue
 
         image = detector.find_hands(image=image, draw=True)
+        landmark_position_list = detector.get_landmark_position(image, 1)
+        # detector.check(image)
+
+        """
+        resolve get position method to only get position of landmark index passed
+            should it be for both hands for for 1?
+        """
 
         # calculate, draw fps
         current_time = time.time()
