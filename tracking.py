@@ -79,12 +79,6 @@ def main():
 
         image = detector.find_hands(image=image, draw=True)
         landmark_position_list = detector.get_landmark_position(image, 1)
-        # detector.check(image)
-
-        """
-        resolve get position method to only get position of landmark index passed
-            should it be for both hands for for 1?
-        """
 
         # calculate, draw fps
         current_time = time.time()
