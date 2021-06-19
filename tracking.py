@@ -1,15 +1,32 @@
 import time
-
 import cv2
 import mediapipe as mp
 
 
+class Detector:
+    def __init__(
+        self,
+        static_image_mode=False,
+        max_num_hands=2,
+        min_detection_confidence=0.5,
+        min_tracking_confidence=0.5,
+    ):
+        self.static_image_mode = static_image_mode
+        self.max_num_hands = max_num_hands
+        self.min_detection_confidence = min_detection_confidence
+        self.min_tracking_confidence = min_tracking_confidence
+
+        self.mp_drawing = mp.solutions.drawing_utils
+        self.mp_hands = mp.solutions.hands
+        self.hands = self.mp_hands.Hands(
+            self.static_image_mode,
+            self.max_num_hands,
+            self.min_detection_confidence,
+            self.min_tracking_confidence,
+        )
+
+
 cap = cv2.VideoCapture(0)
-
-mp_drawing = mp.solutions.drawing_utils
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands()
-
 last_time = current_time = 0
 debug = True
 
